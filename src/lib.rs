@@ -1,6 +1,6 @@
 use std::ptr;
+use windows::core::{w, PCWSTR};
 use windows::Win32::Foundation::{BOOL, HWND};
-use windows::core::{PCWSTR, w};
 
 #[repr(C)]
 pub struct LOADINFO {
@@ -36,23 +36,27 @@ pub extern "system" fn hello(
 
         // Fix for https://dev.adiirc.com/issues/5808 (AdiIRC doesn't stop reading after a null terminator)
         if data.len() > result.len() {
-            ptr::write_bytes(data.0.offset(result.len() as isize + 1) as *mut u16, 0, data.len() - result.len() - 1);
+            ptr::write_bytes(
+                data.0.offset(result.len() as isize + 1) as *mut u16,
+                0,
+                data.len() - result.len() - 1,
+            );
         }
 
         // Write the result to the data variable
         ptr::copy_nonoverlapping(result.as_ptr(), data.0 as *mut u16, result.len() + 1);
     }
     3 // The return value can be:
-    // - 0 means that mIRC should /halt processing
-    // - 1 means that mIRC should continue processing
-    // - 2 means that it has filled the data variable with a command which it wants mIRC to perform, and has filled parms with the parameters to use, if any, when performing the command.
-    // - 3 means that the DLL has filled the data variable with the result that $dll() as an identifier should return.
+      // - 0 means that mIRC should /halt processing
+      // - 1 means that mIRC should continue processing
+      // - 2 means that it has filled the data variable with a command which it wants mIRC to perform, and has filled parms with the parameters to use, if any, when performing the command.
+      // - 3 means that the DLL has filled the data variable with the result that $dll() as an identifier should return.
 }
 
 #[no_mangle]
 pub extern "system" fn LoadDll(info: *mut LOADINFO) {
     unsafe {
-        (*info).m_keep = BOOL(1);    // Keep the DLL loaded
+        (*info).m_keep = BOOL(1); // Keep the DLL loaded
         (*info).m_unicode = BOOL(1); // Use Unicode
     }
 }
@@ -63,6 +67,6 @@ pub extern "system" fn UnloadDll(_m_timeout: i32) -> i32 {
     // - 0: UnloadDll() is being called due to a DLL being unloaded with /dll -u.
     // - 1: UnloadDll() is being called due to a DLL not being used for ten minutes. The UnloadDll() routine can return 0 to keep the DLL loaded, or 1 to allow it to be unloaded.
     // - 2: UnloadDll() is being called due to a DLL being unloaded when mIRC exits.
- 
+
     1 // Allow DLL to be unloaded. This is only honoured when m_timeout is 1.
 }
