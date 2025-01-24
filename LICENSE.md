@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2025 IRC Client Developers
+Copyright (c) 2025 Josh Byrnes &amp; [the project contributors](https://github.com/ircclient-dev/irc-dll-template-rs/graphs/contributors).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

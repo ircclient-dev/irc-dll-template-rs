@@ -1,0 +1,88 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        config:
+          - target: x86_64-pc-windows-msvc
+            extension: x64
+          - target: i686-pc-windows-msvc
+            extension: x86
+          - target: aarch64-pc-windows-msvc
+            extension: arm64
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys:
+            ${{ runner.os }}-cargo-
+
+      - name: Set up Rust
+        run: rustup target add ${{ matrix.config.target }}
+
+      - name: Get Cargo Metadata
+        id: metadata
+        run: cargo metadata --format-version 1 --no-deps > metadata.json
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.config.target }}
+        
+      - name: Rename DLL
+        shell: pwsh
+        run: |
+          $dll_names = (cat metadata.json | jq -r '.packages[].targets[] | select(.kind[] == "cdylib") | .name' | %{ $_ -replace "-", "_" })
+          $new_dir = "target/${{ matrix.config.target }}/release/artifacts"
+          if (-not (Test-Path -Path $new_dir)) {
+            New-Item -ItemType Directory -Path $new_dir
+          }
+          foreach ($dll in $dll_names) {
+            $old_name = "target/${{ matrix.config.target }}/release/${dll}.dll"
+            $new_name = "$new_dir/${dll}_${{ matrix.config.extension }}.dll"
+            Move-Item -Path $old_name -Destination $new_name
+          }
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.config.target }}
+          path: target/${{ matrix.config.target }}/release/artifacts/*_${{ matrix.config.extension }}.dll
+
+  upload-artifacts:
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Consolidate artifacts
+        run: |
+          $consolidated_dir = "consolidated-artifacts"
+          if (-not (Test-Path -Path $consolidated_dir)) {
+            New-Item -ItemType Directory -Path $consolidated_dir
+          }
+          Get-ChildItem -Path artifacts -Recurse -File | ForEach-Object {
+            $destination = Join-Path -Path $consolidated_dir -ChildPath $_.Name
+            Move-Item -Path $_.FullName -Destination $consolidated_dir
+          }
+
+      - name: Upload consolidated artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}
+          path: consolidated-artifacts
