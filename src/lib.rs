@@ -70,3 +70,26 @@ pub extern "system" fn UnloadDll(_m_timeout: i32) -> i32 {
 
     1 // Allow DLL to be unloaded. This is only honoured when m_timeout is 1.
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use windows::core::PCWSTR;
+    use windows::Win32::Foundation::{BOOL, HWND};
+
+    #[test]
+    fn test_hello() {
+        let m_wnd: HWND = HWND(std::ptr::null_mut());
+        let a_wnd: HWND = HWND(std::ptr::null_mut());
+        let data_str = "The quick brown fox jumps over the lazy dog";
+        let data_vec: Vec<u16> = data_str.encode_utf16().collect();
+        let data = PCWSTR(data_vec.as_ptr());
+        let parms = PCWSTR::null();
+        let show: BOOL = BOOL(0);
+        let nopause: BOOL = BOOL(0);
+
+        let result = hello(m_wnd, a_wnd, data, parms, show, nopause);
+        unsafe { assert_eq!(data.as_wide(), w!("Hello, world!").as_wide()) };
+        assert_eq!(result, 3);
+    }
+}
