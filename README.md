@@ -43,9 +43,6 @@ To use the example mSL script to load and call a function from the DLL, follow t
 2. Load the script in mIRC using the `/load -rs example.mrc` command.
 3. Use the `/call_hello` command to call the function from the DLL and display the result.
 
-### Example Command
-- `/call_hello`: Calls the "hello" function from the DLL and echoes the result.
-
 ## GitHub Workflow
 
 The GitHub workflow is defined in [build.yml](.github/workflows/build.yml). It builds the DLLs for the specified targets and uploads them as artifacts.
