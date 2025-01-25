@@ -55,11 +55,11 @@ jobs:
             Move-Item -Path $old_name -Destination $new_name
           }
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.config.target }}
-          path: target/${{ matrix.config.target }}/release/artifacts/*_${{ matrix.config.extension }}.dll
+          - name: Upload artifacts
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ matrix.config.target }}
+            path: artifacts/*_${{ matrix.config.extension }}.dll
 
   upload-artifacts:
     runs-on: windows-latest
