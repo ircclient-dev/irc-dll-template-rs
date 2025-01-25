@@ -40,12 +40,12 @@ jobs:
 
       - name: Build
         run: cargo build --release --target ${{ matrix.config.target }}
-        
+
       - name: Rename DLL
         shell: pwsh
         run: |
           $dll_names = (cat metadata.json | jq -r '.packages[].targets[] | select(.kind[] == "cdylib") | .name' | %{ $_ -replace "-", "_" })
-          $new_dir = "target/${{ matrix.config.target }}/release/artifacts"
+          $new_dir = "artifacts"
           if (-not (Test-Path -Path $new_dir)) {
             New-Item -ItemType Directory -Path $new_dir
           }
