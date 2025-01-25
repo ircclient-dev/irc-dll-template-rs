@@ -42,6 +42,7 @@ jobs:
         run: cargo build --release --target ${{ matrix.config.target }}
 
       - name: Run tests
+        if: matrix.config.target == 'x86_64-pc-windows-msvc' || matrix.config.target == 'i686-pc-windows-msvc' # Run tests only for supported targets
         run: cargo test --target ${{ matrix.config.target }}
 
       - name: Rename DLL
