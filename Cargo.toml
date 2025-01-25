@@ -6,6 +6,13 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib"]
 
+[profile.release]
+strip = true # Strip symbols from the binary to reduce size
+opt-level = "z" # Optimize for size
+codegen-units = 1 # Use a single codegen unit to improve optimization
+panic = "abort" # Abort on panic to reduce binary size
+lto = true # Enable link-time optimization for better performance
+
 [dependencies]
 
 [dependencies.windows]
