@@ -1,0 +1,3 @@
+[submodule "debug-msl"]
+	path = debug-msl
+	url = https://github.com/ircclient-dev/debug-msl.git
