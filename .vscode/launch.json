@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "lldb",
+            "request": "launch",
+            "program": "powershell",
+            "args": [
+                "-Command",
+                "${workspaceFolder}/debug-msl/target/release/debug-msl.exe",
+                ".timer 1 1 .unload -nrs \"${workspaceFolder}/debug.mrc\"",
+                "`|",
+                ".signal debug_script_loaded",
+                "`|",
+                ".reload -rs1 \"${workspaceFolder}/debug.mrc\""
+            ],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Update submodule and build",
+        }
+    ]
+}
