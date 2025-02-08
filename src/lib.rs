@@ -1,4 +1,5 @@
 use std::ptr;
+use std::time::Duration;
 use windows::core::{w, PCWSTR};
 use windows::Win32::Foundation::{BOOL, HWND};
 
@@ -55,6 +56,22 @@ pub extern "system" fn hello(
 
 #[no_mangle]
 pub extern "system" fn LoadDll(info: *mut LOADINFO) {
+    #[cfg(debug_assertions)]
+    {
+        // Start a VS Code debugging session
+        let url = format!(
+            "vscode://vadimcn.vscode-lldb/launch/config?{{'request':'attach','pid':{}}}",
+            std::process::id()
+        );
+        std::process::Command::new("cmd.exe")
+            .arg("/C")
+            .arg("code")
+            .arg("--open-url")
+            .arg(url)
+            .output()
+            .unwrap();
+        std::thread::sleep(Duration::from_millis(1000)); // Wait for debugger to attach
+    }
     unsafe {
         (*info).m_keep = BOOL(1); // Keep the DLL loaded
         (*info).m_unicode = BOOL(1); // Use Unicode

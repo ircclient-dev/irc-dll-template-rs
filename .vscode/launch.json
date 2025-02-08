@@ -11,9 +11,9 @@
                 "${workspaceFolder}/debug-msl/target/release/debug-msl.exe",
                 ".timer 1 1 .unload -nrs \"${workspaceFolder}/debug.mrc\"",
                 "`|",
-                ".signal debug_script_loaded",
+                ".reload -rs1 \"${workspaceFolder}/debug.mrc\"",
                 "`|",
-                ".reload -rs1 \"${workspaceFolder}/debug.mrc\""
+                ".signal debug_script_loaded",
             ],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Update submodule and build",
